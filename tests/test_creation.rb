@@ -8,13 +8,13 @@ class TestCreation < Test::Unit::TestCase
     
     # Create new Gitit
     assert_nothing_raised Exception do
-      git_store = Gitit.new(repo_path)
+      gitit = Gitit.new(repo_path)
     end
     assert(File.exist?("#{repo_path}/HEAD"), "Checking HEAD file exists at #{repo_path}")
     
     # Reload existing Gitit
     assert_nothing_raised Exception do
-      git_store = Gitit.new(repo_path)
+      gitit = Gitit.new(repo_path)
     end
     
     cleanup_dir(repo_path)
@@ -28,10 +28,10 @@ class TestCreation < Test::Unit::TestCase
     create_dir_not_exist(repo_path)
     
     assert_raise Grit::InvalidGitRepositoryError do
-      git_store = Gitit.new(repo_path)
+      gitit = Gitit.new(repo_path)
     end
     
     cleanup_dir(repo_path)
   end
-
+  
 end
