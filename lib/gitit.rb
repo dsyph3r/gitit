@@ -58,6 +58,18 @@ class Gitit
     self.new(clone_to)
   end
   
+  # Fork - Forks an existing repository
+  def fork(fork_path)
+    if File.directory?(fork_path)
+      raise "GititException: Directory #{fork_path} already exists. Cannot fork repository."
+      return
+    end
+
+    forked = @repo.fork_bare(fork_path)
+
+    return Gitit.new(fork_path)
+  end
+  
   # Add - Add a file to the index
   def add(path, data)
     # TODO: check for invalid paths
