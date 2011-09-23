@@ -2,6 +2,7 @@ require 'rubygems'
 require 'bundler/setup'
 require 'grit'
 require 'fileutils'
+require 'digest/sha1'
 
 # Gitit - Provides read/write access to a git repository.
 #
@@ -124,4 +125,56 @@ class Gitit
     return revisions
   end
   
+  # Push - Push changes to remote repository
+  def push(push_path)
+    rgit = Grit::Git.new(@location)
+    opts = {
+      :repo       => push_path,
+      :verbose    => true,
+      :progress   => true,
+    }
+    puts push_path
+    rgit.push(opts)
+  end
+
+  def fetch()
+
+  end
+
+  def merge()
+
+  end
+
+  # Pull - Pull changes in from remote repository
+  # As pull is just a fetch and a merge, should this use the above methods
+  # instead of raw git calls?
+  def pull(pull_path, work_tree_dir)
+
+    # Cannot pull into a repository that doesn't have a working copy. We need to
+    # create a temp working copy else where on disk
+    work_tree_path = "#{work_tree_dir}/#{Digest::SHA1.hexdigest(pull_path)}"
+
+    # Create temp working directoy
+    Dir.mkdir(work_tree_path)
+
+    # Cannot use grit for pull - need to use raw git calls
+    Dir.chdir(work_tree_path) do
+      # We cannot use Grit to do this. There is a bug in the lib that doesn't correctly
+      # set the work_tree path. A pull request has been submitted
+      # https://github.com/mojombo/grit/pull/43 but its from Nov 2010. May
+      # need to implement this ourself
+      #rgit = Grit::Git.new(".")
+      #opts = {
+      #  :git_dir     => full_path,
+      #  :work_tree   => work_tree_path
+      #}
+      #puts rgit.pull(opts, pull_path)
+
+      # Doing a raw shell call instead
+      `git --git-dir="#{@location}" --work-tree="#{work_tree_path}" pull -q`
+    end
+
+    FileUtils.rm_r work_tree_path
+  end
+
 end
