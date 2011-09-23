@@ -58,4 +58,58 @@ class Gitit
     self.new(clone_to)
   end
   
+  # Add - Add a file to the index
+  def add(path, data)
+    # TODO: check for invalid paths
+    @index.add(path, data)
+
+    return true
+  end
+
+  # Commit - Commit the index to the repo
+  def commit(message, author = nil)
+    # Check for parrent
+    if @parent.nil?
+      @parent = @index.commit(message, nil, author)
+    else
+      # Parent of commit can be multiple, hence array for 2nd arg
+      @parent = @index.commit(message, [@parent], author)
+    end
+  end
+
+  # Get File - Gets a file by path. Returns hash containing file information
+  def get_file(path)
+    if (!file_exist(path))
+      return false
+    else
+      raw = @repo.tree/path    # Current tree
+
+      file = {}
+      file['name'] = raw.name
+      file['data'] = raw.data
+      file['size'] = raw.size
+
+      return file
+    end
+  end
+
+  # File Exists - Check if a file at path exists
+  def file_exist(path)
+    raw = @repo.tree/path     # Current tree
+
+    return raw.nil? ? false : true
+  end
+
+  # Revisions - Get revision from current branch
+  def revisions(start, depth = 10)
+    commits = @repo.commits(@branch, depth)
+
+    revisions = []
+    commits.each do |c|
+      revisions.push(c.to_hash)
+    end
+
+    return revisions
+  end
+  
 end
